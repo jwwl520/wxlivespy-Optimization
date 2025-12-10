@@ -207,27 +207,41 @@ class SpyService implements WXLiveEventHandler {
         }
         data.events.push(o);
       } else if (o.decoded_type === 'gift' || o.decoded_type === 'combogift') {
-        const decodedOpenID = this.idCache.get(decodedData.live_info.live_id, o.sec_openid);
+        log.info(`[调试-礼物处理] 处理礼物事件: ${o.nickname}, type=${o.decoded_type}`);
+
+        let decodedOpenID = this.idCache.get(decodedData.live_info.live_id, o.sec_openid);
+
         if (decodedOpenID === null) {
-          // TODO 如果用户上来就发礼物，这里会找不到对应的 decodedOpenID，要怎么处理？
-          log.warn(`getOpenIDFromMsgId failed, msg_id: ${o.msg_id}`);
-          return;
+          // 如果用户上来就发礼物，尝试从 msg_id 中解析 openid
+          log.warn(`[调试-礼物处理] 缓存中找不到openid，尝试从msg_id解析: ${o.msg_id}`);
+
+          // 尝试从 msg_id 解析 decoded_openid
+          const parsedOpenID = WXDataDecoder.getOpenIDFromMsgId(o.msg_id);
+          if (parsedOpenID !== null) {
+            log.info(`[调试-礼物处理] 从msg_id成功解析到openid: ${parsedOpenID}`);
+            decodedOpenID = parsedOpenID;
+            // 缓存起来
+            this.idCache.set(decodedData.live_info.live_id, o.sec_openid, decodedOpenID);
+          } else {
+            log.warn(`[调试-礼物处理] 从msg_id也无法解析openid，使用sec_openid作为标识: ${o.sec_openid}`);
+            // 即使没有decoded_openid，也不应该丢弃礼物事件，使用 sec_openid 作为标识
+            decodedOpenID = o.sec_openid;
+          }
         }
+
         o.decoded_openid = decodedOpenID;
 
         const hexID = WXDataDecoder.getSecOpenIDFromMsgId(o.msg_id);
-        if (hexID === null) {
-          log.error(`getHexIDFromMsgId failed, msg_id: ${o.msg_id}`);
-          return;
+        if (hexID !== null) {
+          const savedOpenID = this.idCache.get(decodedData.live_info.live_id, hexID);
+          if (savedOpenID === null) {
+            this.idCache.set(decodedData.live_info.live_id, hexID, o.decoded_openid);
+          } else if (savedOpenID !== o.decoded_openid) {
+            log.warn(`hexid ${hexID} has two decoded_openid: ${savedOpenID} and ${o.decoded_openid}`);
+          }
         }
 
-        const savedOpenID = this.idCache.get(decodedData.live_info.live_id, hexID);
-        if (savedOpenID === null) {
-          this.idCache.set(decodedData.live_info.live_id, hexID, o.decoded_openid);
-        } else if (savedOpenID !== o.decoded_openid) {
-          log.warn(`hexid ${hexID} has two decoded_openid: ${savedOpenID} and ${o.decoded_openid}`);
-          return;
-        }
+        log.info(`[调试-礼物处理] 礼物事件处理完成，添加到events`);
         data.events.push(o);
       } else {
         const decodedOpenID = this.idCache.get(decodedData.live_info.live_id, o.sec_openid);

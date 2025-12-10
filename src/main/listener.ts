@@ -78,17 +78,42 @@ class WXLiveEventListener {
     if (WXLiveEventListener.skip(response)) {
       return;
     }
-    // log.debug(`handle response: ${response.url()}`);
-    // log.debug(`forward url: ${this.config.getProp('forward_url')}`);
+
+    log.info(`[调试] 拦截到请求: ${response.url()}`);
+
     const responseData = await response.json();
     const requestHeaders = response.request().headers();
     const requestText = response.request().postData();
+
     if (requestText === undefined) {
       log.warn('request text is undefined');
       return;
     }
+
     const requestData = JSON.parse(requestText);
+
+    // 打印响应数据的关键信息
+    log.info(`[调试] msgList数量: ${responseData.data?.msgList?.length || 0}`);
+    log.info(`[调试] appMsgList数量: ${responseData.data?.appMsgList?.length || 0}`);
+
+    // 如果有appMsgList（礼物消息），打印详细信息
+    if (responseData.data?.appMsgList?.length > 0) {
+      log.info(`[调试] 检测到礼物消息！`);
+      responseData.data.appMsgList.forEach((msg: any, index: number) => {
+        log.info(`[调试] 礼物${index + 1}: msgType=${msg.msgType}, nickname=${msg.fromUserContact?.contact?.nickname}`);
+      });
+    }
+
     const decodedData = WXDataDecoder.decodeDataFromResponse(requestHeaders, requestData, responseData);
+
+    // 添加 null 检查
+    if (decodedData === null) {
+      log.warn('[调试] decodedData 为 null');
+      return;
+    }
+
+    log.info(`[调试] 解析后事件数量: ${decodedData.events.length}`);
+
     this.eventHandler.onStatusUpdate(decodedData.live_info);
     if (decodedData.events.length > 0) {
       this.eventHandler.onEvents(decodedData);
@@ -122,7 +147,8 @@ class WXLiveEventListener {
     page.on('response', (response) => {
       this.handleResponse(response);
     });
-    await page.goto(this.config.getProp('spy_url'), { waitUntil: 'networkidle2' });
+    // 改用 domcontentloaded 加快页面加载，减少初始延迟
+    await page.goto(this.config.getProp('spy_url'), { waitUntil: 'domcontentloaded' });
   }
 }
 

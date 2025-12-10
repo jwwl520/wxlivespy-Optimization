@@ -10,7 +10,7 @@
 
 export interface CustomTypes {
     /**
-     * 从 original_body 中解析出来的业务数据
+     * �?original_body 中解析出来的业务数据
      */
     decoded_data: DecodedData;
     /**
@@ -25,28 +25,25 @@ export interface CustomTypes {
 }
 
 /**
- * 从 original_body 中解析出来的业务数据
+ * �?original_body 中解析出来的业务数据
  */
 export interface DecodedData {
     /**
-     * 直播间消息
-     */
+     * 直播间消�?     */
     events: LiveMessage[];
     /**
      * 主播信息
      */
     host_info: HostInfo;
     /**
-     * 直播间信息
-     */
+     * 直播间信�?     */
     live_info: LiveInfo;
     [property: string]: any;
 }
 
 export interface LiveMessage {
     /**
-     * 可选， decoded_type 是 combo_gift 时会有
-     */
+     * 可选， decoded_type �?combo_gift 时会�?     */
     combo_product_count?: number;
     content:              string;
     /**
@@ -54,50 +51,41 @@ export interface LiveMessage {
      */
     decoded_openid: string;
     /**
-     * 解析出来的消息类型: comment, enter, gift, like, enter, levelup, unknown
+     * 解析出来的消息类�? comment, enter, gift, like, enter, levelup, unknown
      */
     decoded_type: string;
     /**
-     * 可选， decoded_type 是 levelup 时会有
-     */
+     * 可选， decoded_type �?levelup 时会�?     */
     from_level?: number;
     /**
-     * 可选， decoded_type 是 gift 时会有
-     */
+     * 可选， decoded_type �?gift 时会�?     */
     gift_num?: number;
     /**
-     * 可选， decoded_type 是 gift 时会有，单位为微信币。是本次送礼物的总价值，不是单价。
-     */
+     * 可选， decoded_type �?gift 时会有，单位为微信币。是本次送礼物的总价值，不是单价�?     */
     gift_value?: number;
     msg_id:      string;
     /**
-     * 从原始请求的 body 中获取, data.msgList[].type 或者 data.appMsgList[].msgType
+     * 从原始请求的 body 中获�? data.msgList[].type 或�?data.appMsgList[].msgType
      */
     msg_sub_type: string;
     /**
-     * 收到消息的unix时间戳
-     */
+     * 收到消息的unix时间�?     */
     msg_time: number;
     nickname: string;
     /**
-     * 可选，类型是 unknown 时会有，原始的消息内容
-     */
+     * 可选，类型�?unknown 时会有，原始的消息内�?     */
     original_data?: { [key: string]: any };
     /**
-     * 可选， decoded_type 是 gift 或 combo_gift 时会有
-     */
+     * 可选， decoded_type �?gift �?combo_gift 时会�?     */
     sec_gift_id?: string;
     /**
-     * 经过加密的用户的微信openid，同一个用户在同一个主播的不同直播场次会变化
-     */
+     * 经过加密的用户的微信openid，同一个用户在同一个主播的不同直播场次会变�?     */
     sec_openid: string;
     /**
-     * 事件在直播间发生的消息序号，从1开始，递增。可能会重复发送，服务器收到之后要自己去重。
-     */
+     * 事件在直播间发生的消息序号，�?开始，递增。可能会重复发送，服务器收到之后要自己去重�?     */
     seq: number;
     /**
-     * 可选， decoded_type 是 levelup 时会有
-     */
+     * 可选， decoded_type �?levelup 时会�?     */
     to_level?: number;
     [property: string]: any;
 }
@@ -107,19 +95,16 @@ export interface LiveMessage {
  */
 export interface HostInfo {
     /**
-     * 从原始请求的 body 中获取
-     */
+     * 从原始请求的 body 中获�?     */
     finder_username: string;
     /**
-     * 从原始请求的 header中获取，可能是主播的微信号（用这个ID作为直播间的唯一标识）
-     */
+     * 从原始请求的 header中获取，可能是主播的微信号（用这个ID作为直播间的唯一标识�?     */
     wechat_uin: string;
     [property: string]: any;
 }
 
 /**
- * 直播间信息
- */
+ * 直播间信�? */
 export interface LiveInfo {
     /**
      * 主播头像
@@ -142,20 +127,17 @@ export interface LiveInfo {
      */
     nickname: string;
     /**
-     * 直播间在线人数
-     */
+     * 直播间在线人�?     */
     online_count: number;
     /**
      * 直播间打赏总金额，单位为微信币
      */
     reward_total_amount_in_wecoin: number;
     /**
-     * 直播间开始时间，unix时间戳
-     */
+     * 直播间开始时间，unix时间�?     */
     start_time: number;
     /**
-     * 从原始请求的 header中获取，可能是主播的微信号（用这个ID作为直播间的唯一标识）
-     */
+     * 从原始请求的 header中获取，可能是主播的微信号（用这个ID作为直播间的唯一标识�?     */
     wechat_uin: string;
     [property: string]: any;
 }
@@ -369,3 +351,4 @@ const typeMap: any = {
         { json: "wechat_uin", js: "wechat_uin", typ: "" },
     ], "any"),
 };
+

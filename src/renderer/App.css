@@ -12,11 +12,32 @@ body {
     #dd5789 51.77%,
     #7a2c9e 129.35%
   );
-  font-family: sans-serif;
-  overflow-y: hidden;
+  font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  overflow-y: auto;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding: 20px 0;
+}
+
+/* 优化滚动条样式 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 button {

@@ -1,3 +1,4 @@
+import log from 'electron-log';
 import { LiveMessage, HostInfo, LiveInfo, DecodedData } from '../CustomTypes';
 
 class WXDataDecoder {
@@ -48,8 +49,9 @@ class WXDataDecoder {
     messageInstance.sec_openid = o.fromUserContact.contact.username;
     messageInstance.nickname = o.fromUserContact.contact.nickname; // o.fromUserContact.displayNickname
     messageInstance.seq = o.seq;
-    // DEBUG("msgType" + o.msgType);
-    // DEBUG("check: " + (o.msgType === 20006));
+
+    log.info(`[调试-礼物解析] msgType=${o.msgType}, nickname=${messageInstance.nickname}`);
+
     if (o.msgType === 20009) {
       messageInstance.decoded_type = 'gift';
       const decodedPayload = Buffer.from(o.payload, 'base64').toString();
@@ -58,6 +60,7 @@ class WXDataDecoder {
       messageInstance.gift_num = giftPayload.reward_product_count;
       messageInstance.gift_value = giftPayload.reward_amount_in_wecoin;
       messageInstance.content = giftPayload.content;
+      log.info(`[调试-礼物解析] 解析到gift: ${messageInstance.nickname} 送了 ${messageInstance.gift_num} 个礼物`);
     } else if (o.msgType === 20013) {
       messageInstance.decoded_type = 'combogift';
       const decodedPayload = Buffer.from(o.payload, 'base64').toString();
@@ -65,17 +68,25 @@ class WXDataDecoder {
       messageInstance.sec_gift_id = giftPayload.reward_product_id;
       messageInstance.combo_product_count = giftPayload.combo_product_count;
       messageInstance.content = giftPayload.content;
+      log.info(
+        `[调试-礼物解析] 解析到combogift: ${messageInstance.nickname} 连击 ${messageInstance.combo_product_count}`,
+      );
     } else if (o.msgType === 20006) {
       messageInstance.decoded_type = 'like';
+      log.info(`[调试-礼物解析] 解析到like: ${messageInstance.nickname} 点赞`);
     } else if (o.msgType === 20031) {
       messageInstance.decoded_type = 'levelup';
       const decodedPayload = Buffer.from(o.payload, 'base64').toString();
       const giftPayload = JSON.parse(decodedPayload);
       messageInstance.from_level = giftPayload.from_level;
       messageInstance.to_level = giftPayload.to_level;
+      log.info(
+        `[调试-礼物解析] 解析到levelup: ${messageInstance.nickname} 从${messageInstance.from_level}升到${messageInstance.to_level}`,
+      );
     } else {
       messageInstance.decoded_type = 'unknown';
       messageInstance.original_data = o;
+      log.warn(`[调试-礼物解析] 未知的msgType: ${o.msgType}`);
     }
     return messageInstance;
   }
